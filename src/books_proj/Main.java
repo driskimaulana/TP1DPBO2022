@@ -7,16 +7,23 @@ package books_proj;
 import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import java.sql.ResultSet;
+
 
 /**
  *
@@ -30,7 +37,10 @@ public class Main extends javax.swing.JFrame {
     
     dbConnection conn = new dbConnection();
     
-    
+    private JScrollPane scrollPane;
+    private AuthorPanel panel;
+    private BooksPanel bPanel;
+    boolean isBook = false;
 
     /**
      *
@@ -38,14 +48,90 @@ public class Main extends javax.swing.JFrame {
     public Main() {
                    
         initComponents();
+        addAuthorPanel.setVisible(false);
+        addBukuPanel.setVisible(false);
         
-        PanelTest panel = new PanelTest();
+        conn.Connect();
         
-        panel.setSize(400, 150);
-        
-        panel_listAuthor.add(panel);
+        panel = new AuthorPanel(false);
+        panel.setLayout(new GridBagLayout());
+        authorScrollPane.setViewportView(panel);
+        getAuthorData();
+//        getBukuData();
     }
     
+    private void getAuthorData(){        
+        try {
+            String sql = "SELECT * FROM author";
+            ResultSet res = conn.getStm().executeQuery(sql);          
+            while (res.next()) {
+                System.out.println(res.getString("nama"));
+
+                String nama = res.getString("nama");
+                String jmlBuku = res.getString("jumlah_buku");
+                String img = res.getString("img_author");
+
+                Author author = new Author(res.getString("nama"), res.getInt("jumlah_buku"), res.getString("img_author"),res.getInt("no_author"));
+                addPanel(author);
+            }
+        } catch (Exception e) {
+            System.err.println("error2 " + e.getMessage());
+        }
+        
+    }
+    
+    private void getBukuData(){
+        try {
+            String sql = "SELECT * FROM buku";
+            ResultSet res = conn.getStm().executeQuery(sql);          
+            while (res.next()) {
+
+                Buku buku = new Buku(res.getString("judul"), res.getString("penerbit"), res.getString("author"),res.getString("desc"), res.getString("img_buku"), res.getInt("nomor_buku"));
+                System.out.println(buku.getNoBuku());
+
+                addPanelBuku(buku);
+            }
+        } catch (Exception e) {
+            System.err.println("error2 " + e.getMessage());
+        }
+    }
+    
+    private void addPanelBuku(Buku buku){
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = bPanel.getComponentCount(); //The new JPanel's place in the list
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.PAGE_START; //I thought this would do it
+//        gbc.ipady = 130; //Set the panel's height, the width will get set to that of the container JPanel (which is what I want since I'd like my JFrames to be resizable)
+        gbc.insets = new Insets(2, 2, 2, 2); //Separation between JPanels in the list
+//        gbc.weightx = 1.0;
+        BooksPanel bukuPanel = new BooksPanel(buku);
+//        authorPanel.setSize(400, 150);
+        bPanel.add(bukuPanel, gbc);
+        bPanel.revalidate();
+        bPanel.invalidate();
+        bPanel.repaint(); //Better safe than peeved
+        pack();
+    }
+    
+    private void addPanel(Author author)
+    {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = panel.getComponentCount(); //The new JPanel's place in the list
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.PAGE_START; //I thought this would do it
+//        gbc.ipady = 130; //Set the panel's height, the width will get set to that of the container JPanel (which is what I want since I'd like my JFrames to be resizable)
+        gbc.insets = new Insets(5, 2, 5, 2); //Separation between JPanels in the list
+//        gbc.weightx = 1.0;
+        AuthorPanel authorPanel = new AuthorPanel(author);
+//        authorPanel.setSize(400, 150);
+        panel.add(authorPanel, gbc);
+        panel.revalidate();
+        panel.invalidate();
+        panel.repaint(); //Better safe than peeved
+        pack();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -57,92 +143,416 @@ public class Main extends javax.swing.JFrame {
     private void initComponents() {
 
         panelAuthor = new javax.swing.JPanel();
-        btn_SwitchBuku = new javax.swing.JButton();
-        btn_addAuthor = new javax.swing.JButton();
-        panel_listAuthor = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        authorScrollPane = new javax.swing.JScrollPane();
+        btn_switch = new javax.swing.JToggleButton();
+        addAuthorPanel = new javax.swing.JPanel();
+        label_nama = new javax.swing.JLabel();
+        btn_submit = new javax.swing.JButton();
+        label_jmlBuku = new javax.swing.JLabel();
+        field_nama = new javax.swing.JTextField();
+        field_jmlBuku = new javax.swing.JTextField();
+        field_imgName = new javax.swing.JTextField();
+        label_imgName = new javax.swing.JLabel();
+        btn_add = new javax.swing.JToggleButton();
+        addBukuPanel = new javax.swing.JPanel();
+        label_judul = new javax.swing.JLabel();
+        label_pengarang = new javax.swing.JLabel();
+        field_judul = new javax.swing.JTextField();
+        label_penerbit = new javax.swing.JLabel();
+        field_pengarang = new javax.swing.JTextField();
+        field_penerbit = new javax.swing.JTextField();
+        field_imgBuku = new javax.swing.JTextField();
+        btn_submitBuku = new javax.swing.JButton();
+        label_imgBuku = new javax.swing.JLabel();
+        label_desc = new javax.swing.JLabel();
+        field_desc = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelAuthor.setBackground(new java.awt.Color(255, 0, 0));
+        panelAuthor.setBackground(java.awt.Color.gray);
 
-        btn_SwitchBuku.setText("Switch");
-        btn_SwitchBuku.addActionListener(new java.awt.event.ActionListener() {
+        authorScrollPane.setBackground(java.awt.Color.gray);
+        authorScrollPane.setForeground(java.awt.Color.gray);
+
+        btn_switch.setText("Switch");
+        btn_switch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_SwitchBukuActionPerformed(evt);
+                btn_switchActionPerformed(evt);
             }
         });
 
-        btn_addAuthor.setText("Add");
+        addAuthorPanel.setBackground(java.awt.Color.gray);
 
-        panel_listAuthor.setBackground(new java.awt.Color(201, 201, 201));
+        label_nama.setText("Nama");
 
-        javax.swing.GroupLayout panel_listAuthorLayout = new javax.swing.GroupLayout(panel_listAuthor);
-        panel_listAuthor.setLayout(panel_listAuthorLayout);
-        panel_listAuthorLayout.setHorizontalGroup(
-            panel_listAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 402, Short.MAX_VALUE)
+        btn_submit.setText("Submit");
+        btn_submit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_submitActionPerformed(evt);
+            }
+        });
+
+        label_jmlBuku.setText("Jumlah Buku");
+
+        field_nama.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_namaActionPerformed(evt);
+            }
+        });
+
+        field_jmlBuku.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_jmlBukuActionPerformed(evt);
+            }
+        });
+
+        field_imgName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_imgNameActionPerformed(evt);
+            }
+        });
+
+        label_imgName.setText("Image Name");
+
+        javax.swing.GroupLayout addAuthorPanelLayout = new javax.swing.GroupLayout(addAuthorPanel);
+        addAuthorPanel.setLayout(addAuthorPanelLayout);
+        addAuthorPanelLayout.setHorizontalGroup(
+            addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addAuthorPanelLayout.createSequentialGroup()
+                .addContainerGap(107, Short.MAX_VALUE)
+                .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btn_submit, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(addAuthorPanelLayout.createSequentialGroup()
+                        .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(addAuthorPanelLayout.createSequentialGroup()
+                                .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(label_nama)
+                                    .addComponent(label_jmlBuku))
+                                .addGap(23, 23, 23))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addAuthorPanelLayout.createSequentialGroup()
+                                .addComponent(label_imgName)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(field_jmlBuku, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                            .addComponent(field_nama, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(field_imgName))))
+                .addGap(47, 47, 47))
         );
-        panel_listAuthorLayout.setVerticalGroup(
-            panel_listAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 589, Short.MAX_VALUE)
+        addAuthorPanelLayout.setVerticalGroup(
+            addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(addAuthorPanelLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_nama))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_jmlBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_jmlBuku))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(addAuthorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_imgName, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_imgName))
+                .addGap(18, 18, 18)
+                .addComponent(btn_submit)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel1.setFont(new java.awt.Font("Ubuntu", 0, 24)); // NOI18N
-        jLabel1.setText("Author List");
+        btn_add.setText("Add");
+        btn_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_addActionPerformed(evt);
+            }
+        });
+
+        addBukuPanel.setBackground(java.awt.Color.gray);
+
+        label_judul.setText("Judul");
+
+        label_pengarang.setText("Pengarang");
+
+        field_judul.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_judulActionPerformed(evt);
+            }
+        });
+
+        label_penerbit.setText("Penerbit");
+
+        field_pengarang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_pengarangActionPerformed(evt);
+            }
+        });
+
+        field_penerbit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_penerbitActionPerformed(evt);
+            }
+        });
+
+        field_imgBuku.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_imgBukuActionPerformed(evt);
+            }
+        });
+
+        btn_submitBuku.setText("Submit");
+        btn_submitBuku.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_submitBukuActionPerformed(evt);
+            }
+        });
+
+        label_imgBuku.setText("Image");
+
+        label_desc.setText("Deskripsi");
+
+        field_desc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                field_descActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout addBukuPanelLayout = new javax.swing.GroupLayout(addBukuPanel);
+        addBukuPanel.setLayout(addBukuPanelLayout);
+        addBukuPanelLayout.setHorizontalGroup(
+            addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addBukuPanelLayout.createSequentialGroup()
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(addBukuPanelLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(label_pengarang)
+                            .addComponent(label_judul)
+                            .addComponent(label_penerbit)
+                            .addComponent(label_imgBuku))
+                        .addGap(23, 23, 23))
+                    .addGroup(addBukuPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(label_desc)
+                        .addGap(36, 36, 36)))
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(field_desc, javax.swing.GroupLayout.PREFERRED_SIZE, 614, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(field_penerbit, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+                            .addComponent(field_pengarang)
+                            .addComponent(field_judul)
+                            .addComponent(field_imgBuku, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addComponent(btn_submitBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        addBukuPanelLayout.setVerticalGroup(
+            addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(addBukuPanelLayout.createSequentialGroup()
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_judul, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_judul))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_pengarang, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_pengarang))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_penerbit, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_penerbit))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(label_imgBuku)
+                    .addComponent(field_imgBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(addBukuPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(field_desc, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label_desc))
+                .addGap(18, 18, 18)
+                .addComponent(btn_submitBuku)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout panelAuthorLayout = new javax.swing.GroupLayout(panelAuthor);
         panelAuthor.setLayout(panelAuthorLayout);
         panelAuthorLayout.setHorizontalGroup(
             panelAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelAuthorLayout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addGroup(panelAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(panel_listAuthor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(panelAuthorLayout.createSequentialGroup()
-                        .addComponent(btn_SwitchBuku, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
-                        .addComponent(btn_addAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(38, 38, 38))
+                .addContainerGap()
+                .addGroup(panelAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(authorScrollPane)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelAuthorLayout.createSequentialGroup()
+                        .addGap(0, 476, Short.MAX_VALUE)
+                        .addComponent(btn_switch, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btn_add, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(66, 66, 66)))
+                .addContainerGap())
             .addGroup(panelAuthorLayout.createSequentialGroup()
-                .addGap(178, 178, 178)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(76, 76, 76)
+                .addComponent(addAuthorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(26, 26, 26))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelAuthorLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(addBukuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 596, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(74, 74, 74))
         );
         panelAuthorLayout.setVerticalGroup(
             panelAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelAuthorLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(36, 36, 36)
                 .addGroup(panelAuthorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_SwitchBuku)
-                    .addComponent(btn_addAuthor))
+                    .addComponent(btn_switch)
+                    .addComponent(btn_add))
+                .addGap(18, 18, 18)
+                .addComponent(addAuthorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(panel_listAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(addBukuPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(authorScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(panelAuthor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(panelAuthor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panelAuthor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panelAuthor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_SwitchBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SwitchBukuActionPerformed
+    private void btn_switchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_switchActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btn_SwitchBukuActionPerformed
+        if(btn_switch.isSelected()){
+            isBook = true;
+            addAuthorPanel.setVisible(false);
+            addBukuPanel.setVisible(false);
+            bPanel = new BooksPanel(false);
+            bPanel.setLayout(new GridBagLayout());
+            authorScrollPane.setViewportView(bPanel);
+            getBukuData();
+        }else {
+            isBook = false;
+            addAuthorPanel.setVisible(false);
+            addBukuPanel.setVisible(false);
+            panel = new AuthorPanel(false);
+            panel.setLayout(new GridBagLayout());
+            authorScrollPane.setViewportView(panel);
+            getAuthorData();
+        }
+    }//GEN-LAST:event_btn_switchActionPerformed
+
+    private void btn_submitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_submitActionPerformed
+        // TODO add your handling code here:
+        String nama = field_nama.getText();
+        String addImg = field_imgName.getText();
+        int addJmlBuku = Integer.valueOf(field_jmlBuku.getText());
+        
+        
+        String query = "INSERT INTO author (nama, jumlah_buku, img_author) VALUES (\'"+nama+"\',\'"+addJmlBuku+"\',\'"+addImg+ "\')";
+        
+        conn.Query(query);
+        // empty the input field
+        field_nama.setText("");
+        field_imgName.setText("");
+        field_jmlBuku.setText("");
+        
+        // refresh scrollpane
+        isBook = false;
+        addAuthorPanel.setVisible(false);
+        addBukuPanel.setVisible(false);
+        panel = new AuthorPanel(false);
+        panel.setLayout(new GridBagLayout());
+        authorScrollPane.setViewportView(panel);
+        getAuthorData();
+        
+        
+        
+    }//GEN-LAST:event_btn_submitActionPerformed
+
+    private void field_namaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_namaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_namaActionPerformed
+
+    private void field_jmlBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_jmlBukuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_jmlBukuActionPerformed
+
+    private void field_imgNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_imgNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_imgNameActionPerformed
+
+    private void btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_addActionPerformed
+        // TODO add your handling code here:
+        if(btn_add.isSelected()){
+            if(isBook){
+                addBukuPanel.setVisible(true);
+            }else {
+                addAuthorPanel.setVisible(true);
+            }
+        }else {
+            addAuthorPanel.setVisible(false);
+            addBukuPanel.setVisible(false);
+        }
+    }//GEN-LAST:event_btn_addActionPerformed
+
+    private void btn_submitBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_submitBukuActionPerformed
+        // TODO add your handling code here:
+        
+        String title = field_judul.getText();
+        String pengarang = field_pengarang.getText();
+        String penerbit = field_penerbit.getText();
+        String imgBuku = field_imgBuku.getText();
+        String deskripsi = field_desc.getText();
+        
+        System.out.println(deskripsi);
+        
+        String query = "insert into `buku` (`judul`, `penerbit`, `desc`, `img_buku`, `author`) VALUES (\'"+ title+"\',\'"+penerbit+"\',\'"+deskripsi+ "\',\'"+imgBuku+ "\',\'"+pengarang+"\')";
+        
+        conn.Query(query);
+        
+        // empty input field
+        field_judul.setText("");
+        field_pengarang.setText("");
+        field_penerbit.setText("");
+        field_imgBuku.setText("");
+        field_desc.setText("");
+        
+        // reset scrollpane
+        isBook = true;
+        addAuthorPanel.setVisible(false);
+        addBukuPanel.setVisible(false);
+        bPanel = new BooksPanel(false);
+        bPanel.setLayout(new GridBagLayout());
+        authorScrollPane.setViewportView(bPanel);
+        getBukuData();
+        
+    }//GEN-LAST:event_btn_submitBukuActionPerformed
+
+    private void field_judulActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_judulActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_judulActionPerformed
+
+    private void field_pengarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_pengarangActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_pengarangActionPerformed
+
+    private void field_penerbitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_penerbitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_penerbitActionPerformed
+
+    private void field_imgBukuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_imgBukuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_imgBukuActionPerformed
+
+    private void field_descActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_field_descActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_field_descActionPerformed
 
     /**
      * @param args the command line arguments
@@ -180,10 +590,29 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_SwitchBuku;
-    private javax.swing.JButton btn_addAuthor;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel addAuthorPanel;
+    private javax.swing.JPanel addBukuPanel;
+    private javax.swing.JScrollPane authorScrollPane;
+    private javax.swing.JToggleButton btn_add;
+    private javax.swing.JButton btn_submit;
+    private javax.swing.JButton btn_submitBuku;
+    private javax.swing.JToggleButton btn_switch;
+    private javax.swing.JTextField field_desc;
+    private javax.swing.JTextField field_imgBuku;
+    private javax.swing.JTextField field_imgName;
+    private javax.swing.JTextField field_jmlBuku;
+    private javax.swing.JTextField field_judul;
+    private javax.swing.JTextField field_nama;
+    private javax.swing.JTextField field_penerbit;
+    private javax.swing.JTextField field_pengarang;
+    private javax.swing.JLabel label_desc;
+    private javax.swing.JLabel label_imgBuku;
+    private javax.swing.JLabel label_imgName;
+    private javax.swing.JLabel label_jmlBuku;
+    private javax.swing.JLabel label_judul;
+    private javax.swing.JLabel label_nama;
+    private javax.swing.JLabel label_penerbit;
+    private javax.swing.JLabel label_pengarang;
     private javax.swing.JPanel panelAuthor;
-    private javax.swing.JPanel panel_listAuthor;
     // End of variables declaration//GEN-END:variables
 }

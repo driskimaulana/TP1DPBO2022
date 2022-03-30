@@ -20,23 +20,20 @@ public class dbConnection {
     
    public void Connect(){
        try {
-           // variabel for store database information
-           String url = "jdbc:mysql://localhost/db_books";
-           String user = "root";
-           String pass = "";
-           
-           Class.forName("com.mysql.jdbc.driver");
-           // create connection
-           conn = DriverManager.getConnection(url, user, pass);
-           
-           // execute statement
-           stm = conn.createStatement();
-           
-           System.out.println("Connection Success");
-           
-       } catch (Exception e) {
-           System.err.println("Connection Failed" + e.getMessage());
-       }
+            String url = "jdbc:mysql://localhost/db_books";
+            String user = "root";
+            String pass = "";
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(url, user, pass);
+            stm = conn.createStatement();
+            System.out.println("koneksi berhasil;");
+        } catch (Exception e) {
+            System.err.println("Koneksi Gagal" + e.getMessage());
+        }
+   }
+   
+   public Statement getStm(){
+       return this.stm;
    }
    
    // method for creating query

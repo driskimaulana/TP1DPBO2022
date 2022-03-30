@@ -14,15 +14,17 @@ public class Author {
     String nama;
     int jumlah_buku;
     String img;
+    int id;
     
     // class constructors
     Author(){
         
     }
-    Author(String nama, int jumlah_buku, String img){
+    Author(String nama, int jumlah_buku, String img, int id){
         this.nama = nama;
         this.jumlah_buku = jumlah_buku;
         this.img = img;
+        this.id = id;
     }
     
     // setter and getter
@@ -50,4 +52,15 @@ public class Author {
     public int getJumlah_buku() {
         return jumlah_buku;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+    
+    
+    
 }
