@@ -13,29 +13,31 @@ public class Buku {
     // class attribute
     String judul;
     String penerbit;
-    Author author;
+    String author;
     String desc;
     String img;
+    int noBuku;
     
     // class constructors
     Buku(){
         
     }
-    Buku(String judul, String penerbit, Author author, String desc, String img){
+    Buku(String judul, String penerbit, String author, String desc, String img, int noBuku){
         this.judul = judul;
         this.penerbit = penerbit;
         this.author = author;
         this.desc = desc;
         this.img = img;
+        this.noBuku = noBuku;
     }
     
     // setter and getter
 
-    public void setAuthor(Author author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 
-    public Author getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
@@ -70,6 +72,16 @@ public class Buku {
     public String getPenerbit() {
         return penerbit;
     }
+
+    public void setNoBuku(int noBuku) {
+        this.noBuku = noBuku;
+    }
+
+    public int getNoBuku() {
+        return noBuku;
+    }
+    
+    
     
     
     
